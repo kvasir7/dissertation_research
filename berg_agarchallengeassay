@@ -1,0 +1,118 @@
+#AGAR BASED CHALLENGE ASSAYS 
+#data = ZOIcorrect 
+#General Linear Model 
+View(ZOIcorrect) 
+GLM10 = glm(ZOI~Bacteria, data = ZOIcorrect) 
+summary(GLM10) 
+Call: 
+glm(formula = ZOI ~ Bacteria, data = ZOIcorrect) 
+Deviance Residuals:  
+Min       1Q   Median       3Q      Max   
+-3.3600  -0.5450   0.0000   0.5475   3.2225   
+Coefficients: 
+                 Estimate Std. Error t value Pr(>|t|)     
+(Intercept)    -7.150e-14  1.118e+00   0.000 1.000000 
+BacteriaZ01     4.330e+00  1.250e+00   3.463 0.000624 *** 
+BacteriaZ02     3.375e+00  1.250e+00   2.699 0.007402 **  
+BacteriaZ03     2.443e+00  1.250e+00   1.954 0.051821 .  
+BacteriaZ04     3.215e+00  1.250e+00   2.572 0.010684 *  
+BacteriaZ05     1.160e+00  1.250e+00   0.928 0.354362    
+BacteriaZ06     4.490e+00  1.250e+00   3.591 0.000394 *** 
+BacteriaZ07     1.955e+00  1.250e+00   1.564 0.119108    
+BacteriaZ08     1.765e+00  1.250e+00   1.412 0.159228    
+BacteriaZ09     2.160e+00  1.250e+00   1.728 0.085239 .  
+BacteriaZ10     4.375e+00  1.250e+00   3.499 0.000549 *** 
+BacteriaZ11     4.515e+00  1.250e+00   3.611 0.000366 *** 
+BacteriaZ12     2.250e+00  1.250e+00   1.800 0.073078 .  
+BacteriaZ13     1.775e+00  1.250e+00   1.420 0.156888    
+BacteriaZ14     1.660e+00  1.250e+00   1.328 0.185430    
+BacteriaZ15     2.040e+00  1.250e+00   1.632 0.103959    
+BacteriaZ16     4.598e+00  1.250e+00   3.677 0.000287 *** 
+BacteriaZ17     5.975e-01  1.250e+00   0.478 0.633117   
+BacteriaZ18     5.573e+00  1.250e+00   4.457 1.24e-05 *** 
+BacteriaZ19     3.980e+00  1.250e+00   3.183 0.001633 **  
+BacteriaZ20     3.978e+00  1.250e+00   3.181 0.001644 **  
+BacteriaZ21     4.065e+00  1.186e+00   3.427 0.000709 *** 
+BacteriaZ22     2.565e+00  1.250e+00   2.052 0.041213 *  
+BacteriaZ23     4.173e+00  1.250e+00   3.337 0.000970 *** 
+BacteriaZ24     1.485e+00  1.250e+00   1.188 0.236010    
+BacteriaZ25     2.770e+00  1.250e+00   2.216 0.027590 *  
+BacteriaZ26     1.590e+00  1.250e+00   1.272 0.204599    
+BacteriaZ27     1.930e+00  1.250e+00   1.544 0.123880    
+BacteriaZ28     5.275e-01  1.250e+00   0.422 0.673433   
+BacteriaZ29     1.595e+00  1.250e+00   1.276 0.203183    
+BacteriaZ30     1.248e+00  1.250e+00   0.998 0.319302    
+BacteriaZ31     8.975e-01  1.250e+00   0.718 0.473488   
+BacteriaZ32     1.130e+00  1.250e+00   0.904 0.366925   
+BacteriaZ33     2.893e+00  1.250e+00   2.314 0.021475 *  
+BacteriaZ34     1.608e+00  1.250e+00   1.286 0.199676    
+BacteriaZ35     1.210e+00  1.250e+00   0.968 0.334038    
+BacteriaZ36     1.208e+00  1.250e+00   0.966 0.335036    
+BacteriaZ37     3.673e+00  1.250e+00   2.937 0.003607 **  
+BacteriaZ38     1.025e+00  1.250e+00   0.820 0.413058    
+BacteriaZ39     6.300e-01  1.250e+00   0.504 0.614756   
+BacteriaZ40     1.103e+00  1.250e+00   0.882 0.378684    
+BacteriaZ41     2.475e-01  1.250e+00   0.198 0.843229   
+BacteriaZ42     1.455e+00  1.250e+00   1.164 0.245584    
+BacteriaZ43     1.488e+00  1.250e+00   1.190 0.235224    
+BacteriaZ44     1.888e+00  1.250e+00   1.510 0.132335    
+BacteriaZ45     1.288e+00  1.250e+00   1.030 0.304062    
+BacteriaZ46     1.925e+00  1.250e+00   1.540 0.124852    
+BacteriaZ47     2.215e+00  1.250e+00   1.772 0.077626 .  
+BacteriaZ48     1.705e+00  1.250e+00   1.364 0.173832    
+BacteriaZ49     4.825e-01  1.250e+00   0.386 0.699867   
+BacteriaZ50     2.560e+00  1.250e+00   2.048 0.041606 *  
+BacteriaZ51     1.800e+00  1.250e+00   1.440 0.151152    
+BacteriaZ52     3.148e+00  1.250e+00   2.518 0.012422 *  
+BacteriaZ53     1.975e+00  1.250e+00   1.580 0.115395    
+BacteriaZ54     1.203e+00  1.250e+00   0.962 0.337038    
+BacteriaZ55     2.315e+00  1.250e+00   1.852 0.065214 .  
+BacteriaZ56     1.853e+00  1.250e+00   1.482 0.139630    
+BacteriaZ57     1.200e+00  1.250e+00   0.960 0.338041    
+BacteriaZ58     3.625e-01  1.250e+00   0.290 0.772090   
+BacteriaZ59     2.545e+00  1.250e+00   2.036 0.042807 *  
+BacteriaZ60     8.350e-01  1.250e+00   0.668 0.504808   
+BacteriaZ61     4.163e+00  1.250e+00   3.329 0.000997 *** 
+BacteriaZ62     1.193e+00  1.250e+00   0.954 0.341064 
+BacteriaZ63     1.650e+00  1.250e+00   1.320 0.188083    
+BacteriaZ64     6.694e-14  1.250e+00   0.000 1.000000   
+BacteriaZ65     2.403e+00  1.250e+00   1.922 0.055749 .  
+BacteriaZ66     3.653e+00  1.250e+00   2.921 0.003791 **  
+BacteriaZ67     5.145e+00  1.250e+00   4.115 5.20e-05 *** 
+BacteriaZ68     1.528e+00  1.250e+00   1.222 0.222905    
+BacteriaZ91     1.678e+00  1.250e+00   1.342 0.180853    
+BacteriaZ92     5.283e+00  1.250e+00   4.225 3.31e-05 *** 
+BacteriaZ93     4.705e+00  1.250e+00   3.763 0.000207 *** 
+BacteriaZ94     3.360e+00  1.250e+00   2.687 0.007665 **  
+BacteriaZ95     1.250e+00  1.250e+00   1.000 0.318335    
+BacteriaZ96     1.435e+00  1.250e+00   1.148 0.252117    
+BacteriaZ97     1.055e+00  1.250e+00   0.844 0.399537    
+BacteriaZ98     6.500e-01  1.250e+00   0.520 0.603576   
+BacteriaZ99     6.350e-01  1.250e+00   0.508 0.611953   
+BacteriaZ99100  2.550e-01  1.250e+00   0.204 0.838544   
+BacteriaZ99101  1.293e+00  1.250e+00   1.034 0.302191    
+BacteriaZ99102  6.150e-01  1.250e+00   0.492 0.623201   
+BacteriaZ99103  1.833e+00  1.250e+00   1.466 0.143936    
+BacteriaZ99104  5.725e-01  1.250e+00   0.458 0.647398   
+BacteriaZ99105  1.185e+00  1.250e+00   0.948 0.344104    
+BacteriaZ99106  1.335e+00  1.250e+00   1.068 0.286605    
+BacteriaZ99107  2.498e+00  1.250e+00   1.998 0.046803 *   
+---
+Signif. codes:  0 
+***
+ 0.001 
+**
+ 0.01 
+*
+ 0.05 
+.
+ 0.1 
+ 1 
+(Dispersion parameter for gaussian family taken to be 1.25047) 
+Null deviance: 948.01  on 344  degrees of freedom 
+Residual deviance: 323.87  on 259  degrees of freedom 
+AIC: 1131.3 
+Number of Fisher Scoring iterations: 2 
+boxplot(ZOI~Bacteria, data = ZOIcorrect, main = "Agar-Based Challenge 
+Assay", xlab = 
+"Bacteria", ylab = "Zone of Inhibition (cm)") 
