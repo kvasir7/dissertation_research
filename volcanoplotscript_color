@@ -1,0 +1,21 @@
+# Download the data from github (click the "raw" button, save as a text file called "results.txt").
+# https://gist.github.com/stephenturner/806e31fce55a8b7175af
+getwd()
+setwd("C:/Users/Joseph.Madison/Documents/R")
+getwd()
+res <- read.csv("RNASeqdata.csv", header=TRUE)
+head(res)
+
+# Make a basic volcano plot
+with(res, plot(log2FoldChange, -log10(qvalue), pch=20, main="Volcano plot", xlim=c(-2.5,2)))
+
+# Add colored points: red if padj<0.05, orange of log2FC>1, green if both)
+with(subset(res, qadj<.05 ), points(log2FoldChange, -log10(qvalue), pch=20, col="red"))
+with(subset(res, abs(log2FoldChange)>1), points(log2FoldChange, -log10(qvalue), pch=20, col="orange"))
+with(subset(res, qadj<.05 & abs(log2FoldChange)>1), points(log2FoldChange, -log10(qvalue), pch=20, col="green"))
+
+# Label points with the textxy function from the calibrate plot
+install.packages("calibrate")
+library(calibrate)
+with(subset(res, qadj<.05 & abs(log2FoldChange)>1), textxy(log2FoldChange, -log10(qvalue), labs=Gene, cex=.8))
+with(subset(res, qadj<.05 & abs(log2FoldChange)>1), textxy(log2FoldChange, -log10(pvalue), labs=Gene, cex=.8))
