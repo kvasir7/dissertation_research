@@ -1,0 +1,24 @@
+install.packages("ggplot2")
+library(ggplot2)
+setwd("C:/Users/Joseph.Madison/Documents/qPCR Data")
+getwd()
+read.csv("RNAseqverify")
+data=read.csv("RNAseqverify.csv")
+data
+
+ggplot(data, aes(x=Gene, y=ExpressionRatio)) + 
+    geom_bar(position=position_dodge(), stat="identity",
+             colour="black", # Use black outlines,
+             size=.3) +      # Thinner lines
+    geom_errorbar(aes(ymin=LowerError, ymax=UpperError),
+                  size=.3,    # Thinner lines
+                  width=.2,
+                  position=position_dodge(.9)) +
+    xlab("Gene (mg)") +
+    ylab("Expression Ratio") +
+    scale_fill_hue(name="Treatment", # Legend label, use darker colors
+                   breaks=c("Bd", "HKBd"),
+                   labels=c("Bd", "Heat-Killed Bd")) +
+    ggtitle("Effect of Bd and Heat-Killed Bd on Gene Expression") +
+    scale_y_continuous(breaks=0:200*20) +
+    theme_bw()
