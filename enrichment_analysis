@@ -1,1 +1,48 @@
+source("http://bioconductor.org/biocLite.R")
+biocLite(c("gage","gageData"))
+a
 
+library(gage)
+setwd
+getwd()
+setwd("C:/Users/Joseph.Madison/Documents/R")
+getwd()
+load(SMWW4EXPD1.csv)
+data(kegg.gs)
+
+read.csv("SMWW4EXPD1.csv")
+filename=system.file("SMWW4EXPD1.txt", package = "gage")
+demo.data=readExpData(filename, row.names=1)
+filename=system.file("extdata/gse16873.demo", package = "gage")
+demo.data=readExpData(filename, row.names=1)
+head(demo.data)
+str(demo.data)
+demo.data=as.matrix(demo.data)
+str(demo.data)
+library(gage)
+kg.smw=kegg.gsets("smw")
+lapply(kg.smw, head, 3)
+lapply(kg.smw, length)
+data(kg.smw)
+filename <- "SMWW4EXPD1.txt"
+data=read.table(filename, row.names=1)
+read.table(SMWW4EXPD1.txt)
+####
+exp.data=readExpData(file = "SMWW4EXPD1.txt")
+head(exp.data)
+str(exp.data)
+exp.data=as.matrix(exp.data)
+str(exp.data)
+data(exp.data)
+
+kg.smw=kegg.gsets("smw")
+kegg.gs=kg.smw$kg.sets[kg.smw$sigmet.idx]
+expdata.kegg.p <- gage(exp.data, gsets = kegg.gs,
+ref = C, samp = BD)
+> #go.gs here only the first 1000 entries as a fast example.
+gse16873.go.p <- gage(gse16873, gsets = go.gs,
+ref = C, samp = BD)
+> str(gse16873.kegg.p, strict.width=
+'
+wrap
+'
