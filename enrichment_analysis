@@ -35,6 +35,7 @@ exp.data=as.matrix(exp.data)
 str(exp.data)
 data(exp.data)
 
+#issues here
 kg.smw=kegg.gsets("smw")
 kegg.gs=kg.smw$kg.sets[kg.smw$sigmet.idx]
 expdata.kegg.p <- gage(exp.data, gsets = kegg.gs,
