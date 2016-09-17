@@ -158,19 +158,6 @@ seq          seq_along    seq.Date     seq.default  seq.int      seq_len      se
 [r]:.q
 root [3] TVectorD v=r.ParseEval("a");
 root [4] v.Print()
-Vector (9)  is as follows
-     |        1  |
-------------------
-   0 |1 
-   1 |1.5 
-   2 |2 
-   3 |2.5 
-   4 |3 
-   5 |3.5 
-   6 |4 
-   7 |4.5 
-   8 |5 
-root [4]
 
 #include<TRInterface.h>
 #include<TMath.h>
