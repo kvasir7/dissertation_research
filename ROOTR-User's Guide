@@ -1,0 +1,472 @@
+#install on gnu/linux
+apt-get install r-base r-base-dev
+install.packages(c('Rcpp','RInside'))
+install.packages(c('C50','RSNNS','e1071','xgboost'))
+git clone http://root.cern.ch/git/root.git
+mkdir compile
+cd compile
+-Dr=ON ..
+make -j n
+
+#include<TRInterface.h>
+//creating an instance
+ROOT::R::TRInterface &r=ROOT::R::TRInterface::Instance();
+//executing simple r commands with the operator <<
+r<<"print('hello ROOTR')";
+r<<"vec=c(1,2,3)"<<"print(vec)";
+//executing R's code using the method Execute that doesn't return anything
+r.Execute("print('hello ROOTR')");
+//We execute the code using the method Eval which returns an instance of TRObjectProxy
+//which can be converted to a ROOTR supported classes
+std::vector<Int_t> v=r.Eval("c(1,2,3)");
+std::cout<<v[0]<<" "<<v[1]<<" "<<v[2]<<std::endl;
+std::vector<Double_t> vd(3);
+//obtaining variables from R environment using the operators [] and >> 
+r["seq(0,1,0.5)"]>>vd;
+std::cout<<vd[0]<<" "<<vd[1]<<" "<<vd[2]<<std::endl;
+std::vector<Int_t> v1(3);
+v1[0]=0;
+v1[1]=1;
+v1[2]=2;
+r["v1"]<<v1;
+r<<"print(v1)";
+TMatrixD m(2,2);
+//Creating a matrix inside r environment and converting it into a TMatrixD
+r<<"mat<-matrix(c(0.1,0.2,0.3,0.4),nrow=2)";
+r["mat"]>>m;
+m.Print();
+
+#include<TRInterface.h>
+#include<TMath.h>
+Double_t myfun(Double_t x)
+{
+    return 2*cos(x);
+}
+Double_t myfun2(std::vector<Double_t> x) //use std::vector<Double_t> instead Double_t*
+{
+    return x[1]*cos(x[0]);
+}
+void fun()
+{
+ROOT::R::TRInterface &r=ROOT::R::TRInterface::Instance();
+r["dilog"]<<ROOT::R::TRFunctionExport(TMath::DiLog);
+r["myfun"]<<myfun;
+r["myfun2"]<<myfun2;
+r<<"print(dilog(0))";
+r<<"print(myfun(0))";
+r<<"print(myfun2(c(0,4)))";
+}
+
+#include<TRInterface.h>
+Double_t myfun(Double_t x)
+{
+    return 2*cos(x);
+}
+Int_t myfun(Int_t x) 
+{
+    return x;
+}
+void fun()
+{
+ROOT::R::TRInterface &r=ROOT::R::TRInterface::Instance();
+r["myfund"]<<(Double_t (*)(Double_t))myfun;
+r["myfuni"]<<(Int_t (*)(Int_t))myfun;
+r<<"print(myfund(0.0))";
+r<<"print(myfuni(1))";
+}
+
+////////////////////////
+//creating variables//
+////////////////////////
+TVectorD v1(3);
+std::vector<Double_t> v2(3);
+std::array<Int_t,3>  v3{ {1,2,3} };
+std::list<std::string> names;
+//////////////////////
+//assigning values//
+//////////////////////
+v1[0]=1;
+v1[1]=2;
+v1[2]=3;
+v2[0]=0.101;
+v2[1]=0.202;
+v2[2]=0.303;
+names.push_back("v1");
+names.push_back("v2");
+names.push_back("v3");
+ROOT::R::TRInterface &r=ROOT::R::TRInterface::Instance();
+
+/////////////////////////////////////////////////
+//creating dataframe object with its labels//
+/////////////////////////////////////////////////
+ROOT::R::TRDataFrame  df1(ROOT::R::Label["var1"]=v1,ROOT::R::Label["var2"]=v2,ROOT::R::Label["var3"]=v3,ROOT::R::Label["strings"]=names);
+//////////////////////////////////////////////
+//Passing dataframe to R's environment//
+//////////////////////////////////////////////
+r["df1"]<<df1;
+r<<"print(df1)";
+
+////////////////////////////////
+//Adding colunms to dataframe //
+////////////////////////////////
+TVectorD v4(3);
+//filling the vector fro R's environment
+r["c(-1,-2,-3)"]>>v4;
+//adding new colunm to df1 with name var4
+df1["var4"]=v4;
+//updating df1 in R's environment
+r["df1"]<<df1;
+//printing df1
+r<<"print(df1)";
+
+//////////////////////////////////////////
+//Getting dataframe from R's environment//
+//////////////////////////////////////////
+ROOT::R::TRDataFrame df2;
+r<<"df2<-data.frame(v1=c(0.1,0.2,0.3),v2=c(3,2,1))";
+r["df2"]>>df2;
+TVectorD v(3);
+df2["v1"]>>v;
+v.Print();
+df2["v2"]>>v;
+v.Print();
+
+///////////////////////////////////////////
+//Working with colunms between dataframes//
+///////////////////////////////////////////
+df2["v3"]<<df1["strings"];
+//updating df2 in R's environment
+r["df2"]<<df2;
+r<<"print(df2)";
+
+///////////////////////////////////////////
+//Working with colunms between dataframes//
+///////////////////////////////////////////
+//passing values from colunm v3 of df2 to var1 of df1 
+df2["v3"]>>df1["var1"];
+//updating df1 in R's environment
+r["df1"]<<df1;
+r<<"print(df1)";
+
+[omazapa] [tuxhome] [~]$ root -l
+root [0] #include<TRInterface.h>
+root [1] ROOT::R::TRInterface &r=ROOT::R::TRInterface::Instance();
+root [2] r.Interactive()
+[r]:a=seq
+seq          seq_along    seq.Date     seq.default  seq.int      seq_len      seq.POSIXt   sequence     
+[r]:a=seq(1,5,0.5)
+[r]:.q
+root [3] TVectorD v=r.ParseEval("a");
+root [4] v.Print()
+Vector (9)  is as follows
+     |        1  |
+------------------
+   0 |1 
+   1 |1.5 
+   2 |2 
+   3 |2.5 
+   4 |3 
+   5 |3.5 
+   6 |4 
+   7 |4.5 
+   8 |5 
+root [4]
+
+#include<TRInterface.h>
+#include<TMath.h>
+typedef Double_t (*Function)(Double_t);
+//Functor class with the function inside
+class MyFunctor{
+public:
+  MyFunctor(){
+    status=false;
+    f=TMath::BesselY1;
+  }
+  void setFunction(Function fun)
+  {
+    f=fun;
+    status=true;
+  }
+  Bool_t getStatus(){return status;}
+  Double_t doEval(Double_t x) {
+    return f(x);
+  }
+private:
+   Function f;
+   Bool_t status;
+};
+//this macro exposes the class into R's enviornment
+// and lets you pass objects directly.
+ROOTR_EXPOSED_CLASS(MyFunctor)
+//Macro to create a module
+ROOTR_MODULE(MyFunctorModule) {
+    ROOT::R::class_<MyFunctor>( "MyFunctor" )
+    //creating a default constructor
+    .constructor()
+    //adding the method doEval to evaluate the internal function
+    .method( "doEval", &MyFunctor::doEval )
+    .method( "getStatus", &MyFunctor::getStatus)
+    ;
+}
+void Functor()
+{
+   ROOT::R::TRInterface &r=ROOT::R::TRInterface::Instance();
+   ////////////////////////////////////////////////////////////
+   //Creating a functor with default function TMath::BesselY1//
+   // and status false from R's environment                  //             
+   ////////////////////////////////////////////////////////////
+   //Loading module into R's enviornment
+   r["MyFunctorModule"]<<LOAD_ROOTR_MODULE(MyFunctorModule);
+   //creating a class variable from the module
+   r<<"MyFunctor <- MyFunctorModule$MyFunctor";
+   //creating a MyFunctor's object
+   r<<"u <- new(MyFunctor)";
+   //printing status
+   r<<"print(u$getStatus())";
+   //printing values from Functor and Function
+   r<<"print(sprintf('value in R = %f',u$doEval( 1 )))";
+   std::cout<<"value in ROOT = "<<TMath::BesselY1(1)<<std::endl;
+   ////////////////////////////////////////////////////////////
+   //creating a MyFunctor's object and passing object to R's //
+   //enviornment, the status should be true because is not   //
+   //using the default function                              //
+   ////////////////////////////////////////////////////////////
+   MyFunctor functor;
+   functor.setFunction(TMath::Erf);
+   r["functor"]<<functor;
+   //printing the status that should be true
+   r<<"print(functor$getStatus())";
+   r<<"print(sprintf('value in R = %f',functor$doEval( 1 )))";
+   std::cout<<"value in ROOT = "<<TMath::Erf(1)<<std::endl;
+}
+
+#include<TRInterface.h>
+#include<TRandom.h>
+TCanvas *SimpleFitting(){
+   TCanvas *c1 = new TCanvas("c1","Curve Fitting",700,500);
+   c1->SetGrid();
+   // draw a frame to define the range
+   TMultiGraph *mg = new TMultiGraph();
+   // create the first graph (points with gaussian noise)
+   const Int_t n = 24;
+   Double_t x1[n] ;
+   Double_t y1[n] ;
+   //Generate the points along a X^3 with noise
+   TRandom rg;
+   rg.SetSeed(520);
+   for (Int_t i = 0; i < n; i++) {
+      x1[i] = rg.Uniform(0, 1);
+      y1[i] = TMath::Power(x1[i], 3) + rg.Gaus() * 0.06;
+   }
+   TGraph *gr1 = new TGraph(n,x1,y1);
+   gr1->SetMarkerColor(kBlue);
+   gr1->SetMarkerStyle(8);
+   gr1->SetMarkerSize(1);
+   mg->Add(gr1);
+      // create the second graph
+   TF1 *f_known=new TF1("f_known","pow(x,3)",0,1);
+   TGraph *gr2 = new TGraph(f_known);
+   gr2->SetMarkerColor(kRed);
+   gr2->SetMarkerStyle(8);
+   gr2->SetMarkerSize(1);
+   mg->Add(gr2);
+   //passing data to Rfot fitting
+     ROOT::R::TRInterface &r=ROOT::R::TRInterface::Instance();
+   r["x"]<<TVectorD(n, x1);
+   r["y"]<<TVectorD(n, y1);
+   //creating a R data frame
+   r<<"ds<-data.frame(x=x,y=y)";
+   //fitting x and y to X^power using Nonlinear Least Squares
+   r<<"m <- nls(y ~ I(x^power),data = ds, start = list(power = 1),trace = T)";
+   //getting the exponent
+   Double_t power;
+   r["summary(m)$coefficients[1]"]>>power;
+   TF1 *f_fitted=new TF1("f_fitted","pow(x,[0])",0,1);
+   f_fitted->SetParameter(0,power);
+   //plotting the fitted function
+   TGraph *gr3 = new TGraph(f_fitted);
+   gr3->SetMarkerColor(kGreen);
+   gr3->SetMarkerStyle(8);
+   gr3->SetMarkerSize(1);
+   mg->Add(gr3);
+   mg->Draw("ap");
+   //displaying basic results
+   TPaveText *pt = new TPaveText(0.1,0.6,0.5,0.9,"brNDC");
+   pt->SetFillColor(18);
+   pt->SetTextAlign(12);
+   pt->AddText("Fitting x^power ");
+   pt->AddText(" \"Blue\"   Points with gaussian noise to be fitted");
+   pt->AddText(" \"Red\"    Known function x^3");
+   TString fmsg;
+   fmsg.Form(" \"Green\"  Fitted function with power=%.4lf",power);
+   pt->AddText(fmsg);
+   pt->Draw();   
+   c1->Update();
+   return c1;
+}
+
+#include<TRInterface.h>
+ROOT::R::TRInterface &r=ROOT::R::TRInterface::Instance();
+r<<"install.packages('DEoptim',repos='http://cran.rstudio.com/')";
+
+#include<TRInterface.h>
+#include<TBenchmark.h>
+#include<math.h>
+#include<stdlib.h>
+//In the next function the *double pointer should be changed by a TVectorD datatype,
+//because the pointer has no meaning in the R enviroment.
+//This is a generalization of the RosenBrock function, with the min xi=1 and i>0.
+Double_t GenRosenBrock(const TVectorD xx )
+{
+  int length=xx.GetNoElements();
+  Double_t result=0;
+  for(int i=0;i<(length-1);i++)
+  {
+    result+=pow(1-xx[i],2)+100*pow(xx[i+1]-pow(xx[i],2),2);
+  }
+  return result;
+}
+//the min xi=0 i>0
+Double_t Rastrigin(const TVectorD xx)
+{
+  int length=xx.GetNoElements();
+  Double_t result=10*length;
+  for(int i=0;i<length;i++)
+  {
+    result+=xx[i]*xx[i]-10*cos(6.2831853*xx[i]);
+  }
+  return result;
+}
+void GlobalMinimization()
+{
+ TBenchmark bench;
+ ROOT::R::TRInterface &r=ROOT::R::TRInterface::Instance();
+ Bool_t installed=r.Eval("is.element('DEoptim', installed.packages()[,1])");
+ if(!installed)
+ {
+    std::cout<<"Package DEoptim no installed in R"<<std::endl;
+    std::cout<<"Run install.packages('DEoptim') in R's environment"<<std::endl;
+    return;
+ }
+ //loading DEoptim
+ r<<"suppressMessages(library(DEoptim, quietly = TRUE))";
+//  passing RosenBrock function to R
+ r["GenRosenBrock"]<<GenRosenBrock;
+ //maximun number of iterations 
+ r["MaxIter"]<<5000;
+ //n = size of vector that is an argument for GenRosenBrock
+ r["n"]<<3;
+ //lower limits
+ r<<"ll<-rep(-25, n)";
+ //upper limits
+ r<<"ul<-rep(25, n)";
+ bench.Start("GlobalMinimizationRosenBrock");
+ //calling minimization and timing it.
+ r<<"result1<-DEoptim(fn=GenRosenBrock,lower=ll,upper=ul,control=list(NP=10*n,itermax=MaxIter,trace=FALSE))";
+ std::cout<<"-----------------------------------------"<<std::endl;
+ std::cout<<"RosenBrock's minimum in: "<<std::endl;
+ r<<"print(result1$optim$bestmem)";
+ std::cout<<"Bechmark Times"<<std::endl;
+//  printing times
+ bench.Show("GlobalMinimizationRosenBrock");
+ //passing RosenBrock function to R
+ r["Rastrigin"]<<Rastrigin;
+ //maximun number of iterations 
+ r["MaxIter"]<<2000;
+ //n = size of a vector which is an argument for Rastrigin
+ r["n"]<<3;
+ //lower limits
+ r<<"ll<-rep(-5, n)";
+ //upper limits
+ r<<"ul<-rep(5, n)";
+ bench.Start("GlobalMinimizationRastrigin");
+ //calling minimization and timing it.
+ r<<"result2<-DEoptim(fn=Rastrigin,lower=ll,upper=ul,control=list(NP=10*n,itermax=MaxIter,trace=FALSE))";
+ std::cout<<"-----------------------------------------"<<std::endl;
+ std::cout<<"Rastrigin's minimum in: "<<std::endl;
+ r<<"print(result2$optim$bestmem)";
+ std::cout<<"Bechmark Times"<<std::endl;
+ //printing times
+ bench.Show("GlobalMinimizationRastrigin");
+ r<<"dev.new(title='RosenBrock Convergence')";
+ r<<"plot(result1,type='o',pch='.')";
+ r<<"dev.new(title='Rastrigin Convergence')";
+ r<<"plot(result2,type='o',pch='.')";
+}
+
+#include<TRInterface.h>
+#include<TRandom.h>
+#include<vector>
+void Interpolation()
+{
+ ROOT::R::TRInterface &r=ROOT::R::TRInterface::Instance();  
+//Creting points
+TRandom rg;
+std::vector<Double_t> x(10),y(10);
+for(int i=0;i<10;i++)
+{
+  x[i]=i;
+  y[i]=rg.Gaus();
+}
+r["x"]=x;
+r["y"]=y;
+r<<"dev.new()";//Required to activate new window for plotting
+//Plot parameter. Plotting using two rows and one column
+r<<"par(mfrow = c(2,1))";
+//plotting the points
+r<<"plot(x, y, main = 'approx(.) and approxfun(.)')";
+//The function "approx" returns a list with components x and y, 
+//containing n coordinates which interpolate the given data points according to the method (and rule) desired.
+r<<"points(approx(x, y), col = 2, pch = '*')";
+r<<"points(approx(x, y, method = 'constant'), col = 4, pch = '*')";
+//The function "approxfun" returns a function performing (linear or constant) 
+//interpolation of the given data. 
+//For a given set of x values, this function will return the corresponding interpolated values.
+r<<"f <- approxfun(x, y)";
+r<<"curve(f(x), 0, 11, col = 'green2')";
+r<<"points(x, y)";
+//using approxfun with const method
+r<<"fc <- approxfun(x, y, method = 'const')";
+r<<"curve(fc(x), 0, 10, col = 'darkblue', add = TRUE)";
+// different interpolation on left and right side :
+r<<"plot(approxfun(x, y, rule = 2:1), 0, 11,col = 'tomato', add = TRUE, lty = 3, lwd = 2)";
+}
+
+#include<TMath.h>
+#include<TRInterface.h>
+#include<Math/Integrator.h>
+#include<TF1.h>
+//To integrate using R the function must be vectorized
+//The idea is just to receive a vector like an argument,to evaluate 
+//every element saving the result in another vector 
+//and return the resultant vector.
+std::vector<Double_t>  BreitWignerVectorized(std::vector<Double_t> xx)
+{
+  std::vector<Double_t> result(xx.size());
+  for(Int_t i=0;i<xx.size();i++)
+  {
+    result[i]=TMath::BreitWigner(xx[i]);
+  }
+  return result;
+}
+double BreitWignerWrap( double x){ 
+   return TMath::BreitWigner(x);
+}
+void Integration()
+{
+  ROOT::R::TRInterface &r=ROOT::R::TRInterface::Instance();
+  r["BreitWigner"]=BreitWignerVectorized;
+  Double_t value=r.Eval("integrate(BreitWigner, lower = -2, upper = 2)$value");
+  std::cout.precision(18);
+  std::cout<<"Integral of the BreitWigner Function in the interval [-2, 2] R        = "<<value<<std::endl;
+  ROOT::Math::WrappedFunction<> wf(BreitWignerWrap);
+  ROOT::Math::Integrator i(wf);
+  value=i.Integral(-2,2);
+  std::cout<<"Integral of the BreitWigner Function in the interval [-2, 2] MathMore = "<<value<<std::endl;
+  TF1 f1("BreitWigner","BreitWignerWrap(x)");
+  value=f1.Integral(-2,2);
+  std::cout<<"Integral of the BreitWigner Function in the interval [-2, 2] TF1      = "<<value<<std::endl;
+  //infinte limits
+  value=r.Eval("integrate(BreitWigner, lower = -Inf, upper = Inf)$value");
+  std::cout<<"Integral of BreitWigner Function in the interval [-Inf, Inf] R    = "<<value<<std::endl;
+}
