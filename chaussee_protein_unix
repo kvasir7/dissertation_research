@@ -1,0 +1,2 @@
+cat 'Streptococcus_pyogenes_amino acid content of proteins.txt | sed 's/\(^>.*\)/!\1!/' | tr '\n' '@' | tr '!' '\n' | sed 's/@//g' > 'proteins.txt'
+egrep '>|W' 'protein.txt'
