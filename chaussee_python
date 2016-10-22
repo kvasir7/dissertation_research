@@ -1,1 +1,21 @@
+#!/usr/bin/python
 
+print "Hello!"
+recs = {}
+header = ""
+with open('input.txt', 'r') as file:
+  for line in file:
+		line = line.strip()
+		if not line:
+			continue # skip blanks
+		if line.startswith('>'):
+			header = line
+			recs[header] = []
+		else:
+			sequence = line
+			recs[header].append(sequence)
+print len (recs)
+
+#for header recs:
+#	record = recs[header]
+# 	sort the record...
