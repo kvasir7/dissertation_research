@@ -1,0 +1,29 @@
+install.packages("gplots", dependencies = TRUE)
+   library(gplots)
+install.packages("RColorBrewer", dependencies = TRUE)
+   library(RColorBrewer)
+setwd("C:/Users/Joseph.Madison/Desktop/Heat Map Data")
+getwd()
+data <- read.csv("data.csv")
+rnames <- data[,1]                            # assign labels in column 1 to "rnames"
+mat_data <- data.matrix(data[,2:ncol(data)])  # transform column 2-5 into a matrix
+rownames(mat_data) <- rnames  
+my_palette <- colorRampPalette(c("red", "yellow", "green"))(n = 299)
+col_breaks = c(seq(-1,0,length=100),  # for red
+  seq(0.01,0.8,length=100),           # for yellow
+  seq(0.81,1,length=100))             # for green
+png("data",    # create PNG for the heat map        
+  width = 5*300,        # 5 x 300 pixels
+  height = 5*300,
+  res = 300,            # 300 pixels per inch
+  pointsize = 4)        # smaller font size
+heatmap.2(mat_data,
+  cellnote = mat_data,  # same data set for cell labels
+  main = "Gene Expression", # heat map title
+  density.info="none",  # turns off density plot inside color legend
+  trace="none",         # turns off trace lines inside the heat map
+  margins =c(12,9),     # widens margins around plot
+  col=my_palette,       # use on color palette defined earlier
+  breaks=col_breaks,    # enable color transition at specified limits
+  Colv="NA")            # turn off column clustering
+dev.off()               # close the PNG device
