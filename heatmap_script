@@ -2,9 +2,9 @@ install.packages("gplots", dependencies = TRUE)
    library(gplots)
 install.packages("RColorBrewer", dependencies = TRUE)
    library(RColorBrewer)
-setwd("C:/Users/Joseph.Madison/Desktop/Heat Map Data")
+setwd("C:/Users/Joseph.Madison/Desktop/Heat Map Data") #set working directory as needed
 getwd()
-data <- read.csv("data.csv")
+data <- read.csv("data.csv")                  # data.csv from modified data file
 rnames <- data[,1]                            # assign labels in column 1 to "rnames"
 mat_data <- data.matrix(data[,2:ncol(data)])  # transform column 2-5 into a matrix
 rownames(mat_data) <- rnames  
