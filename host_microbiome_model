@@ -1,0 +1,89 @@
+#this is the file where the ODE model code will be kept for the host_microbiome project
+#code is in python
+
+import numpy
+import math
+import matplotlib as plt
+
+#model parameters
+
+time_step = 0.25 #simulation time step in hours
+start_time = 0 #start of model run, hours
+end_time = 168 #end of model run, hours
+individual_frog_skin_area = #total area of frog skin
+frog_population = #will multiply frog skin area acordingly, assumes all frogs have equal skin area
+doses_per_day = 6      sys.argv[1]
+dosage_per_day = 12000 sys.argv[2]  #number of bacteria/mL
+growth_rate_bacteria = 0.25     # growth rate constant, bacteria
+half_life = 6          # in hours
+blood_volume = 4.6     # 
+probiotic_level = 800  # level at which drug becomes effective mg/l
+toxic_level = 1000     # level at which drug becomes toxic  mg/l
+
+
+# Derived constants
+N = int((end_time - start_time) / time_step)   # number of simulation steps
+dosage = dosage_per_day / doses_per_day        # amount of each dose
+dosage_interval = 24 / doses_per_day           # in hours
+excretion_rate = math.log(2) / half_life
+steps_between_doses = dosage_interval / time_step
+
+# Time-varying quantities, arrays with one value per time step
+# The syntax, "[0]*(N+1)," creates a one-dimensional array of length N+1 whose values are all zero.
+
+t = [0]*(N+1)                       # time in hours
+intake = [0]*(N+1)                  # dose at this time step
+bacteria_on_skin = [0]*(N+1)        # number of bacteria on skin
+plasma_level = [0]*(N+1)            # level of drug in the blood
+skin_concentration = [0]*(N+1)      # concentration of bacteria on skin
+absorption = [0]*(N+1)              # amount absorbed at this time step
+excretion = [0]*(N+1)               # amount excreted at this time step
+
+# Initialize variables - assume all others start at 0
+t[0] = start_time
+step_next_dose = 1         # give first dose at start time
+
+# Loop to calculate growth of probiotic bacteria over time 
+# Euler's method
+# this part calculates when each dose of the drug is added based on
+# the number of doses over a 24 hour period. Number of doses must be an
+# integer divisor of 24 for this to work.  Otherwise change the time step
+for i in range(N):
+    t[i+1] = t[i] + time_step
+# Is it time for a dose?
+    if i == step_next_dose:
+        intake[i] = dosage
+        step_next_dose = i + steps_between_doses
+    else:
+        intake[i] = 0
+       
+       
+#TODO: Create another loop that calculates the absorption, excretion,
+for i in range(N):
+        absorption[i]=time_step * absorption_rate * medicine_in_intestines[i]
+        excretion[i] = time_step * excretion_rate * plasma_level[i]
+        medicine_in_intestines[i+1] = medicine_in_intestines[i] - absorption[i] + intake[i]
+        plasma_level[i+1] = plasma_level[i] - excretion[i] + absorption[i]
+        plasma_concentration[i+1] = plasma_level[i] = plasma_level[i+1] / blood_volume
+
+
+#plasma level, and plasma concentration over time
+
+# Now Plot the results
+
+plt.plot(t,plasma_concentration, color = 'b', label= "Plasma Concentration")
+
+m_level = [medicinal_level]*(N+1)
+plt.plot(t, m_level, color= 'r', label= "Medicinal Level",)
+
+t_level = [toxic_level]*(N+1)
+plt.plot(t, t_level, color = 'g', label = "Toxic Level")
+
+plt.legend(loc=4)
+
+plt.xlabel('Time (h)')
+plt.ylabel('Concentration (mg/L)')
+plt.minorticks_on()
+plt.ylim(0,1100)
+plt.show()
+               
